@@ -25,7 +25,7 @@ login_managers=(
 
 # check if any login manager is installed...
 for login_manager in "${login_managers[@]}"; do
-    if sudo pacman -Qs "$login_manager" &> /dev/null; then
+    if sudo pacman -Q "$login_manager" &> /dev/null; then
         info ac "Disabling $login_manager.."
         sudo systemctl disable "$login_manager" 2>&1 | tee -a "$log"
     fi
@@ -47,34 +47,28 @@ sddm_conf_dir=/etc/sddm.conf.d
 clear
     
 # SDDM-themes
-valid_input=false
-while [ "$valid_input" != true ]; do
-    info at "Installing SDDM Theme\n"
-    mkdir -p "$parent_dir/.cache"
 
+# Install THEME
+theme="$parent_dir/assets/minimal_sddm.tar.gz"
+theme_dir=/usr/share/sddm/themes
 
-    git clone --depth=1 https://github.com/me-js-bro/sddm.git "$parent_dir/.cache/sddm"
-    if [[ -d "$parent_dir/.cache/sddm" ]]; then
-        # Check if /usr/share/sddm/themes/simple-sddm exists and remove if it does
-        if [[ -d "/usr/share/sddm/themes/arch-sddm" ]]; then
-        sudo rm -rf "/usr/share/sddm/themes/arch-sddm"
-        info ok "Removed existing 'arch-sddm' directory.\n"
-        fi
-
-        # Check if simple-sddm directory exists in the current directory and remove if it does
-        if [[ ! -d "/usr/share/sddm/themes" ]]; then
-            sudo mkdir -p /usr/share/sddm/themes
-            info ok "Directory '/usr/share/sddm/themes' created.\n"
-        fi
-      sudo cp -r "$parent_dir/.cache/sddm/arch-sddm" /usr/share/sddm/themes/
-      printf "[Theme]\nCurrent=arch-sddm\n" | sudo tee "$sddm_conf_dir/theme.conf.user"
-    fi
-    valid_input=true
-done
-
-if [[ -d "/usr/share/sddm/themes/arch-sddm" ]]; then
-    info ok "Sddm theme was installed successfully."
-    rm -rf "$parent_dir/.cache/sddm"
+# creating sddm theme dir
+if [ ! -d "$theme_dir" ]; then
+    msg att "Sddm theme dir was not found, creatint it..."
+    sudo mkdir -p "$theme_dir"
 fi
 
-clear
+# Set up SDDM
+msg act "Setting up the Login Screen..."
+sddm_conf_dir=/etc/sddm.conf.d
+[ ! -d "$sddm_conf_dir" ] &&  sudo mkdir -p "$sddm_conf_dir"
+
+
+sudo tar -xf "$theme" -C "$theme_dir"
+echo -e "[Theme]\nCurrent=minimal_sddm" | sudo tee "$sddm_conf_dir/theme.conf.user" &> /dev/null
+
+if [ -d "$theme_dir/minimal_sddm" ]; then
+    msg dn "Sddm theme was installed successfully!"
+fi
+
+sleep 1 && clear

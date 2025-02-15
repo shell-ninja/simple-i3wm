@@ -17,6 +17,8 @@ log_dir="$dir/Logs"
 log="$log_dir/Setup_$(date +%d-%m-%y).log"
 mkdir -p "$log_dir" && touch "$log"
 
+mkdir -p "$dir/.cache" && touch "$dir/.cache/aur" 
+
 [[ -f "$scripts/00-global.sh" ]] && . "$scripts/00-global.sh" || { printf "${red}Could not file any 'Global Script, exiting now...'"; sleep 1; exit 1; }
 
 
@@ -75,6 +77,15 @@ aur_helper=$(command -v paru || command -v yay)
 if [[ -n "$aur_helper" ]]; then
     info ok "Aur Helper was located in $aur_helper. Moving on.." 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 else
+    info qs "Which Aur helper would you like to install? \n  1) paru \n  2) yay\n"
+    read -p "  Select: " aur
+
+    if [[ "$aur" -eq 1 ]]; then
+       echo "paru" >> "$dir/.cache/aur" 
+    else
+        echo "yay" >> "$dir/.cache/aur"
+    fi
+
     "$scripts/01-aur.sh" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 fi
 

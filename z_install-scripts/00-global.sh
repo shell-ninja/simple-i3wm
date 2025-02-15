@@ -11,12 +11,13 @@ orange="\x1b[38;5;214m"
 end="\e[1;0m"
 
 # texts
-att="${orange} [ ATTENTION ] ${end}"
-acc="${green} [ ACTION ] ${end}"
-ok="${cyan} [ OK ] ${end}"
-note="${blue} [ NOTE ] ${end}"
-qus="${yellow} [ QUESTION ] ${end}"
-err="${red} [ ERROR ] ${end}"
+att="${orange}** ${end}"
+acc="${green}=> ${end}"
+ok="${cyan}:: ${end}"
+note="${blue}!! ${end}"
+qus="${yellow}?? ${end}"
+skip="${magenta}<> ${end}"
+err="${red}>< oopss! an error${end}"
 
 # prompt message function
 info() {
@@ -24,17 +25,19 @@ info() {
     local msg="$2"
 
     case $action in
-        at) printf "\n$att \n  $msg\n"
+        at) printf "$att $msg\n"
         ;;
-        ac) printf "\n$acc \n  $msg\n"
+        ac) printf "$acc $msg\n"
         ;;
-        ok) printf "$ok \n  $msg\n\n"
+        ok) printf "$ok $msg\n"
         ;;
-        nt) printf "$note \n  $msg\n"
+        nt) printf "$note $msg\n"
         ;;
-        qs) printf "\n$qus \n  $msg\n"
+        qs) printf "$qus $msg\n"
         ;;
-        er) printf "\n$err \n  ${red}$msg${end}\n"
+        skp) printf "$skip $msg\n"
+        ;;
+        er) printf "$err\n   $msg\n"
         ;;
         *) echo "$msg"
         ;;
@@ -42,43 +45,20 @@ info() {
 }
 
 # Define installation functions
-package_manager=$(command -v pacman || command -v yay || command -v paru)
 aur_helper=$(command -v yay || command -v paru) # Find the AUR helper
-
-# Check if the package is installed
-check() {
-    local is_installed
-    is_installed=$(sudo "$package_manager" -Qi "$1" &> /dev/null; echo $?)
-    
-    if [ "$is_installed" -eq 0 ]; then
-        case $2 in
-            1) info ok "$1 is already installed"; return 0 ;;
-            2) return 0 ;;
-        esac
-    else
-        case $2 in
-            2) info er "Could not install $1"; return 1 ;;
-        esac
-        return 1
-    fi
-}
 
 # Install using package manager
 install() {
-    if check "$1" 1; then
-        return 0
+    if "$aur_helper" -Q $1 &> /dev/null; then
+        info skp "Skipping $1. It's already there..."
     else
-        info ac "Installing $1" && sleep 0.5
-        sudo pacman -S --noconfirm "$1" && check "$1" 2 && info ok "$1 was installed successfully"
-    fi
-}
+        info ac "Installing $1"
+        sudo pacman -S --noconfirm "$1" &> /dev/null
 
-# install using aur
-install_Aur() {
-    if check "$1" 1; then
-        return 0
-    else
-        info ac "Installing $1" && sleep 0.5
-        "$aur_helper" -S --noconfirm "$1" && check "$1" 2 && info ok "$1 was installed successfully"
+        if "$aur_helper" -Q $1 &> /dev/null; then
+            info ok "$1 was installed successfully!"
+        else
+            info err "Could not install $1.."
+        fi
     fi
 }

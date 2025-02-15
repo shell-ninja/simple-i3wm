@@ -17,6 +17,7 @@ other_packages=(
     ffmpeg
     imagemagick
     kvantum
+    kvantum-qt5
     libinput
     lxappearance
     network-manager-applet
@@ -28,7 +29,6 @@ other_packages=(
     pamixer
     pavucontrol
     python-pywal
-    python-pillow
     wget
     xdotool
     xorg-xinput
@@ -40,5 +40,5 @@ other_packages=(
 for pkgs in "${other_packages[@]}"; do
     install "$pkgs" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 done
-clear && sleep 1
+sleep 1 && clear
 #_________ end _________#

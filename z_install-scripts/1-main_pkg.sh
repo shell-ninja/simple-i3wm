@@ -29,8 +29,8 @@ packages=(
     qt5-quickcontrols
     qt6ct
     qt6-svg
-    ranger
     rofi
+    yazi
 )
 
 aur_packages=(
@@ -59,7 +59,7 @@ clear
 
 # install aur packages
 for pkgs in "${aur_packages[@]}"; do
-    install_Aur "$pkgs" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
+    install "$pkgs" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 done
 
 clear
@@ -68,5 +68,5 @@ clear
 for pkgs in "${thunar[@]}"; do
     install "$pkgs" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 done
-clear && sleep 1
+sleep 1 && clear
 #____________ end ____________#
