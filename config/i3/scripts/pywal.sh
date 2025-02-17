@@ -80,10 +80,6 @@ update_polybar_colors() {
 update_polybar_colors
 
 
-
-# alacritty colors
-alacritty=~/.config/alacritty/alacritty.toml
-
 # Extract colors using jq
 background_color=$(jq -r '.special.background' "$colors_file")
 foreground_color=$(jq -r '.special.foreground' "$colors_file")
@@ -195,6 +191,7 @@ if [ -f $colors_file ]; then
 
     # Update VS Code settings
     vscode_settings_file="$HOME/.config/Code/User/settings.json"
+    if [ -f "$vscode_settings_file" ]; then
     cat <<EOF >"$vscode_settings_file"
 {
     "editor.mouseWheelZoom": true,
@@ -236,6 +233,7 @@ if [ -f $colors_file ]; then
     },
 }
 EOF
+    fi
 fi
 
 

@@ -54,7 +54,7 @@ cp -r "$dir/config"/* "$HOME/.config/"
 
 if [[ -d "$HOME/.config/i3/scripts" ]]; then
     chmod +x "$HOME/.config/i3/scripts"/*
-    chmod +x "$HOME/.config/ranger/scope.sh"
+    chmod +x "$HOME/.config/polybar/launch.sh"
     info ok "Copied successfully!" 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
 else
     info er "Could not copy dotfiles..." 2>&1 | tee -a >(sed 's/\x1B\[[0-9;]*[JKmsu]//g' >> "$log")
